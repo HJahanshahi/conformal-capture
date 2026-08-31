@@ -1,0 +1,21 @@
+% Table 1: Overall results comparison
+\begin{table}[t]
+\centering
+\caption{Overall rendezvous performance across 45 trajectories $\times$ 3 seeds = 135 runs. All 135 runs of both configurations complete; statistics are computed over all 135 runs.}
+\label{tab:overall}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Metric} & \textbf{Baseline} & \textbf{Conformal} \\
+\midrule
+Position mean (at $t_f$) & $5.64$\,cm & $4.70$\,cm \\
+Position median & $4.84$\,cm & $4.04$\,cm \\
+Position 95th percentile & $10.94$\,cm & $9.55$\,cm \\
+Orientation mean (at $t_f$) & $11.88$$^{\circ}$ & $12.40$$^{\circ}$ \\
+Orientation median & $7.22$$^{\circ}$ & $4.02$$^{\circ}$ \\
+Orientation 95th percentile & $39.18$$^{\circ}$ & $59.40$$^{\circ}$ \\
+\midrule
+Capture-ready rate & $77\%$ & $82\%$ \\
+Strict capture (5\,cm \& 5$^{\circ}$) & $24\%$ & $47\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,20 @@
+[project]
+name = "capture"
+version = "0.1.0"
+description = "Uncertainty-aware space debris capture using UPN + space-robot-dq"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy",
+    "scipy",
+    "torch>=1.9",
+    "torchdiffeq",
+    "matplotlib",
+    "tqdm",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["capture*"]

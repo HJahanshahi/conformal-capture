@@ -1,0 +1,33 @@
+{
+  "alpha": 0.1,
+  "confidence": 0.9,
+  "method": "traj_max",
+  "guarantee": "exact 1-alpha, UNIFORM over all queries of a new trajectory",
+  "calibration_source": "capture_lib_v2\\calibration_matched_200.npz",
+  "position_score": "grasp_point",
+  "lookaheads": [
+    0.5,
+    1.0,
+    1.5,
+    2.0
+  ],
+  "q_hat_orientation_deg": {
+    "0.5": 40.67840667904747,
+    "1.0": 84.54536703655292,
+    "1.5": 131.5448316712501,
+    "2.0": 166.57711227415078
+  },
+  "q_hat_position_cm": {
+    "0.5": 31.947850267384766,
+    "1.0": 62.728005229680136,
+    "1.5": 92.79605197379041,
+    "2.0": 123.36746076536112
+  },
+  "calibration_n_samples": {
+    "0.5": 4800,
+    "1.0": 4800,
+    "1.5": 3600,
+    "2.0": 3000
+  },
+  "calibration_n_trajectories": 200
+}

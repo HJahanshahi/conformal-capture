@@ -1,0 +1,33 @@
+{
+  "alpha": 0.1,
+  "confidence": 0.9,
+  "method": "repeated_subsample",
+  "guarantee": "finite-sample 1-2*alpha marginal; empirically ~1-alpha",
+  "calibration_source": "capture_lib_v2\\calibration_matched_200.npz",
+  "position_score": "grasp_point",
+  "lookaheads": [
+    0.5,
+    1.0,
+    1.5,
+    2.0
+  ],
+  "q_hat_orientation_deg": {
+    "0.5": 18.185586128095444,
+    "1.0": 34.40988887244369,
+    "1.5": 60.74795165007851,
+    "2.0": 87.5675763148855
+  },
+  "q_hat_position_cm": {
+    "0.5": 14.897656172205084,
+    "1.0": 30.042408853720005,
+    "1.5": 61.575786650949084,
+    "2.0": 89.87264002402102
+  },
+  "calibration_n_samples": {
+    "0.5": 4800,
+    "1.0": 4800,
+    "1.5": 3600,
+    "2.0": 3000
+  },
+  "calibration_n_trajectories": 200
+}

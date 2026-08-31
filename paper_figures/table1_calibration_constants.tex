@@ -1,0 +1,17 @@
+% Table 2: Conformal calibration constants and coverage
+\begin{table}[t]
+\centering
+\caption{Conformal calibration constants $\hat{q}$ at 90\% confidence, with empirical coverage measured on the full held-out test set (45 trajectories). Bounds use the hierarchical repeated-subsampling construction over 200 independently generated calibration trajectories.}
+\label{tab:calibration}
+\begin{tabular}{cccccc}
+\toprule
+\textbf{Lookahead} & $n$ & $\hat{q}_{\mathrm{ori}}$ & $\hat{q}_{\mathrm{pos}}$ & \textbf{Cov.\ ori} & \textbf{Cov.\ pos} \\
+ & & (deg) & (cm) & (\%) & (\%) \\
+\midrule
+$0.5$\,s & 4800 & $18.19$ & $14.90$ & $91.4$ & $90.4$ \\
+$1.0$\,s & 4800 & $34.41$ & $30.04$ & $91.3$ & $90.4$ \\
+$1.5$\,s & 3600 & $60.75$ & $61.58$ & $91.2$ & $90.4$ \\
+$2.0$\,s & 3000 & $87.57$ & $89.87$ & $91.6$ & $90.7$ \\
+\bottomrule
+\end{tabular}
+\end{table}

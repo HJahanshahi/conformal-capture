@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "conformal-capture"
+version = "1.0.0"
+description = "Conformally calibrated motion prediction for adaptive capture of tumbling targets with a free-floating manipulator"
+authors = [
+  {name = "Hadi Jahanshahi", email = "hadij@yorku.ca"},
+  {name = "Zheng Hong (George) Zhu"},
+]
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.24", "scipy>=1.10", "torch>=2.0", "matplotlib>=3.7", "tqdm"]
+
+[project.urls]
+Repository = "https://github.com/HJahanshahi/conformal-capture"
+
+[tool.setuptools.packages.find]
+include = ["cap_control*", "capture_lib_v2*"]

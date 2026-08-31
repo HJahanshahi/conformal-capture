@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the accompanying article."
+title: "conformal-capture: Conformally Calibrated Motion Prediction for Adaptive Capture of Tumbling Targets"
+authors:
+  - family-names: Jahanshahi
+    given-names: Hadi
+    email: hadij@yorku.ca
+    affiliation: York University
+  - family-names: Zhu
+    given-names: Zheng Hong (George)
+    affiliation: York University
+repository-code: "https://github.com/HJahanshahi/conformal-capture"
+license: MIT
+preferred-citation:
+  type: article
+  title: "Conformally Calibrated Motion Prediction for Adaptive Capture of Tumbling Targets with a Free-Floating Manipulator"
+  authors:
+    - family-names: Jahanshahi
+      given-names: Hadi
+    - family-names: Zhu
+      given-names: Zheng Hong (George)
+  journal: "Frontiers in Space Technologies"
+  year: 2026
