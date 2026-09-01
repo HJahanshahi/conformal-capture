@@ -284,7 +284,9 @@ class FreeFloatingChaser:
 
 __all__ = ["FreeFloatingChaser", "FreeFloatingState"]
 
-# --- plant sub-stepping (added by apply_substepping.py) ---
+# --- plant sub-stepping: the control torque is held constant over each
+# 10 Hz control period while the dynamics are advanced in cfg.PLANT_SUBSTEPS
+# substeps, an effective 200 Hz integration rate. ---
 import numpy as _np
 from cap_control import config as _cfg
 
