@@ -24,29 +24,32 @@ weights reproduces the published values exactly.
 A physics-informed Uncertainty Propagation Network forecasts the tumbling
 target's pose; a hierarchical split-conformal layer turns those forecasts into
 distribution-free, finite-sample bounds; and the capture controller consumes
-the bounds online through three mechanisms: replan rejection, smooth
-orientation-gain modulation, and a rejection-overflow contingency.
+the bounds online through three mechanisms: replan rejection, continuous
+orientation-gain modulation evaluated at the lookahead currently in force, and
+a rejection-overflow contingency.
 
 <p align="center">
   <img src="paper_figures/figure07_trajectory_3d.png" width="90%"><br>
-  <em>End-effector and grasp-point paths for a successful capture (0.7 cm
-  terminal error) and the benchmark's hardest run, where the contingency keeps
-  the approach bounded at 9.3 cm despite a forecast that never becomes
-  reliable.</em>
+  <em>End-effector and grasp-point paths for a successful capture (2.1 cm
+  terminal error) and a difficult encounter that ends 25.0 cm short after ten
+  rejections and two contingency activations; the non-adaptive baseline fares
+  no better on that run.</em>
 </p>
 
 Across 135 closed-loop runs spanning tumble rates from 0.3 to 29.6 deg/s,
-conformal adaptation improves the median rendezvous error from 4.84 to 4.04 cm
-and from 7.22 to 4.02 deg, raises the capture-ready rate from 77% to 82%,
-nearly doubles the strict-capture rate from 24% to 47%, and completes every run
-without divergence.
+conformal adaptation improves the median rendezvous error from 5.18 to 4.37 cm
+and from 5.06 to 2.48 deg, raises the capture-ready rate from 78% to 89%, and
+raises the strict-capture rate from 30% to 49%, with every run of both
+configurations completing. A component study attributes the improvement across
+the three mechanisms.
 
 <p align="center">
   <img src="paper_figures/figure09_tracking_errors_envelope.png" width="90%"><br>
   <em>Tracking errors against the calibrated envelope. Left: the successful run
-  converges into the shrinking envelope. Right: the hardest run, where
-  rejections accumulate and the contingency bounds the outcome into a
-  diagnosable miss instead of a divergence.</em>
+  converges into the shrinking envelope. Right: the difficult encounter, where
+  the envelope is repeatedly reset by short-horizon plans while the error stays
+  above it, because the error is dominated by the age of the plan being
+  followed.</em>
 </p>
 
 ## Repository layout
@@ -127,6 +130,10 @@ ablation outcomes.
 * `scripts/c6_exact_xi.py` - exact orientation law (Jacobian-rate term) A/B
   comparison on a ten-run subset.
 * `scripts/make_all_figures.py` - all figures and the four LaTeX tables.
+* `scripts/STUDIES.md` - the selection and verification studies reported in
+  the article: gain and torque-limit selection, the mechanism component study
+  behind Table 5, the plant-integration convergence study, and the passivity
+  check of the Coriolis construction.
 
 ## Citation
 

@@ -5,41 +5,48 @@ Baseline arm: `path2_winning_v2_results.json`. Conformal arm:
 `path2_conformal_v3_results.json`. Both arms complete all 135 runs
 (45 trajectories x 3 sensor-noise seeds); statistics are over all 135.
 
+Deployed configuration: exact reduced free-floating dynamics, plant advanced
+in 20 substeps per 10 Hz control period with zero-order-hold torque,
+K_p^ori = 10 modulated to 1 across the 20-40 deg band and evaluated at every
+control step, K_d = 0.6 K_p, blend window 1.5 s, torque limit 20 N m,
+rejection threshold 40 deg, contingency after 4 consecutive rejections.
+
 ## Table 2: overall rendezvous accuracy
 
 | metric | baseline | conformal |
 |---|---|---|
-| mean position (cm) | 5.64 | 4.70 |
-| median position (cm) | 4.84 | 4.04 |
-| 95th percentile position (cm) | 10.94 | 9.55 |
-| mean orientation (deg) | 11.88 | 12.40 |
-| median orientation (deg) | 7.22 | 4.02 |
-| 95th percentile orientation (deg) | 39.18 | 59.40 |
-| capture-ready (< 10 cm, < 15 deg) | 77% | 82% |
-| strict capture (< 5 cm, < 5 deg) | 24% | 47% |
+| mean position (cm) | 6.71 | 5.71 |
+| median position (cm) | 5.18 | 4.37 |
+| 95th percentile position (cm) | 15.32 | 16.48 |
+| mean orientation (deg) | 9.81 | 7.46 |
+| median orientation (deg) | 5.06 | 2.48 |
+| 95th percentile orientation (deg) | 31.69 | 27.88 |
+| capture-ready (< 10 cm, < 15 deg) | 78% | 89% |
+| strict capture (< 5 cm, < 5 deg) | 30% | 49% |
 
 ## Table 4: joint threshold grid (baseline % / conformal %)
 
-5/5: 24 / 47 · 5/10: 39 / 59 · 10/10: 65 / 79 · 10/15: 77 / 82 ·
-15/15: 81 / 83 · 15/20: 84 / 88
+5/5: 30 / 49 · 5/10: 39 / 60 · 10/10: 67 / 84 · 10/15: 78 / 89 ·
+15/15: 83 / 91 · 15/20: 87 / 91
 
 ## Figure 3: cumulative distribution anchors
 
-position < 5 cm: 51 -> 67 · orientation < 5 deg: 35 -> 61 ·
-position < 10 cm: 93 -> 95 · orientation < 15 deg: 81 -> 83
+position < 5 cm: 47 -> 64 · position < 10 cm: 86 -> 92 ·
+orientation < 5 deg: 50 -> 70 · orientation < 15 deg: 84 -> 93
 
 ## Table 3: per-tumble-rate breakdown, median (IQR)
 
 | bin | n | baseline position | conformal position | baseline orientation | conformal orientation |
 |---|---|---|---|---|---|
-| low (< 3 deg/s) | 18 | 4.45 (2.94-5.80) | 3.93 (3.27-4.73) | 3.73 (1.86-7.28) | 1.95 (1.54-3.66) |
-| mid (3-10) | 48 | 4.99 (3.69-7.66) | 4.07 (2.49-6.25) | 7.58 (4.27-13.48) | 4.62 (2.77-8.90) |
-| high (10-20) | 48 | 4.79 (3.41-6.42) | 3.45 (2.60-5.38) | 7.23 (4.32-11.19) | 3.66 (1.85-6.21) |
-| extreme (> 20) | 21 | 5.57 (4.21-6.61) | 4.48 (2.55-6.24) | 8.12 (6.32-13.01) | 5.90 (3.81-11.38) |
+| low (< 3 deg/s) | 18 | 4.60 (3.06-6.26) | 3.93 (2.36-5.02) | 3.63 (2.04-6.13) | 1.52 (1.25-4.47) |
+| mid (3-10) | 48 | 5.76 (3.95-11.21) | 4.45 (2.88-6.90) | 6.94 (3.68-16.25) | 2.19 (1.49-5.00) |
+| high (10-20) | 48 | 4.54 (3.34-6.58) | 4.36 (2.91-5.68) | 4.30 (2.68-8.60) | 2.89 (1.72-5.52) |
+| extreme (> 20) | 21 | 6.92 (4.60-9.06) | 4.37 (2.29-8.45) | 7.80 (3.61-10.23) | 4.21 (2.29-9.12) |
 
-Median orientation improvement by bin: -48%, -39%, -49%, -27%.
-Mean orientation, extreme versus mid bin: 10.03 vs 13.63 deg (baseline),
-12.59 vs 13.81 deg (conformal).
+Median improvement by bin: orientation -58%, -69%, -33%, -46%;
+position -15%, -23%, -4%, -37%. Mean orientation in the extreme bin is
+higher for the conformal arm (16.19 against 10.31 deg) because one run in
+that bin of 21 ends 173 deg misaligned.
 
 ## Table 1: calibration constants and coverage
 
@@ -55,52 +62,62 @@ calibration trajectories, grasp-point position scores, alpha = 0.10.
 
 Calibration samples: 4800 / 4800 / 3600 / 3000 (200 trajectories each).
 Per-trajectory-maximum variant (reported, not deployed): 40.7 / 84.5 /
-131.5 / 166.6 deg, with 93-98% uniform-per-trajectory coverage for
-orientation and 84% for position.
-The orientation bound crosses the 40 deg rejection threshold at a lookahead
-of about 1.11 s.
+131.5 / 166.6 deg. The orientation bound crosses the 40 deg rejection
+threshold at a lookahead of about 1.11 s.
 
-## Mechanism statistics (conformal arm)
+## Table 5: mechanism component study (validation split, 15 traj x 2 seeds)
 
-* Rejections: mean 2.28 per run, 89% of runs at most five, maximum 12.
-* Rejection strata (capture-ready rate): 0 rejections n = 35, 83%;
-  1-3 rejections n = 67, 91%; 4 or more n = 33, 64%.
-* Contingency: 13 activations across 11 runs; those runs reach 18%
-  capture-ready; worst-case position error over all 135 runs is 24.2 cm.
+| configuration | capture-ready | strict | mean ori (deg) | p95 ori (deg) |
+|---|---|---|---|---|
+| no mechanisms | 87% | 23% | 11.66 | 41.4 |
+| deployed system | 87% | 50% | 7.24 | 27.2 |
+| gain set once per plan | 70% | 43% | 21.06 | 103.4 |
+| no rejection or contingency | 43% | 7% | 24.25 | 86.8 |
+
+## Mechanism statistics (conformal arm, test set)
+
+* Rejections: mean 2.30 per run, 88% of runs at most five, maximum 11.
+* Rejection strata (capture-ready): 0 rejections n = 36, 92%;
+  1-3 rejections n = 67, 96%; 4 or more n = 32, 72%.
+* Contingency: 17 activations across 15 runs; those runs reach 47%
+  capture-ready.
 * Calibrated bound at the last accepted replan: at most 39.9 deg in every run.
-* Torque saturation: 341 of 5400 steps (6.31%); 42 runs with at least one
-  clip; median run zero.
-* Terminal orientation error above 40 deg: 8 of 135 runs (5.9%).
+* Torque saturation: 5.96% of control steps clip at 20 N m; 50 runs with at
+  least one clip; median run zero.
+* Certificate violations: position 1 of 135 (0.7%), orientation above 40 deg
+  4 of 135 (3.0%).
+* Run-by-run comparison: 21 encounters the baseline fails are captured, and
+  6 encounters the baseline handles are lost.
 
 ## Showcase runs (Figures 7-10)
 
-* Success: trajectory 13, seed 2, final 0.73 cm / 6.7 deg.
-* Failure: trajectory 33, seed 1, final 9.32 cm / 161.8 deg, with 12
-  threshold exceedances and 2 contingency activations.
+* Success: trajectory 13, seed 2, final 2.13 cm / 3.3 deg, 2 rejections.
+* Difficult: trajectory 42, seed 1, final 25.00 cm / 11.6 deg, 10 rejections,
+  2 contingency activations (baseline on the same run: 28.5 cm).
 
 ## Ablations
 
-**Lookahead schedule** (`path2_tau_schedule.py`): 134 of 135 runs complete;
-capture-ready 81% (vs 82%); strict 46% (vs 47%); medians 3.83 cm / 4.11 deg;
-rejections 2.19 per run; 10 contingency activations in 9 runs; mean maximum
-bound seen 71.9 deg (vs 87.6 deg calibrated at 2 s).
+**Lookahead schedule** (`path2_tau_schedule.py`): 135 of 135 complete;
+capture-ready 86% (deployed 89%); medians 4.33 cm / 2.66 deg; 95th percentile
+orientation 34.95 deg (deployed 27.88); mean maximum bound 73.7 deg (deployed
+82.9); rejections 2.39; 18 contingency activations in 16 runs.
 
-**Out of distribution, 30-50 deg/s** (`ood_ablation.py`): both arms complete
-135 of 135. Conformal: 67% capture-ready, median 5.37 cm / 9.51 deg, 95th
-percentile 13.42 cm / 82.97 deg, worst-case position 22.4 cm, rejections 1.65
-per run. Baseline: 62% capture-ready, median 6.13 cm / 10.64 deg, 95th
-percentile 12.12 cm / 41.22 deg. Coverage of the deployed bounds at 1 s
-lookahead falls to 30.4% (orientation) and 66.7% (position).
+**Out of distribution, 30-50 deg/s** (`ood_ablation.py`): conformal completes
+135 of 135 and reaches 77% capture-ready with medians 6.07 cm / 6.17 deg;
+baseline completes 133 of 135 and reaches 59% with medians 7.44 cm /
+8.31 deg. Coverage of the deployed bounds at 1 s lookahead falls to 30.4%
+(orientation) and 66.7% (position).
 
-**Exact orientation law** (`c6_exact_xi.py`): on the ten-run subset the
-omitted Jacobian-rate term measures 0.3-9 rad/s^2 in nominally tracking
-terminal windows and 200-405 rad/s^2 during saturation and rejection churn.
-The deployed law reproduces bit-for-bit; the exact-law variant is unstable in
-the high-term cases and its outcomes vary between platforms, so only the
-deployed-law column is expected to match exactly.
+**Exact orientation law** (`c6_exact_xi.py`): the omitted Jacobian-rate term
+measures 0.3-13 rad/s^2 in nominally tracking runs, where including it
+usually improves terminal errors slightly, and grows to roughly 1500 rad/s^2
+during rejection churn, where feeding it back destabilises two runs that
+complete under the deployed law (86 cm and 24 cm). Only the deployed-law
+column is expected to match exactly.
 
 ## Notes on reproducibility
 
-The calibration, benchmark, and first two ablations are deterministic given
-the shipped datasets and weights. Figures 2-6 are computed from the two
-result files; Figures 7-10 re-simulate the two showcase runs.
+The calibration, benchmark, and the first two ablations are deterministic
+given the shipped datasets and weights. Figures 2-6 are computed from the two
+result files; Figures 7-10 re-simulate the two showcase runs and reproduce
+their terminal errors exactly (2.1 cm and 25.0 cm in Figure 7).
