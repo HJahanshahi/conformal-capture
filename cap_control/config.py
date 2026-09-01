@@ -79,3 +79,7 @@ GRASP_CONFIDENCE   = 0.90            # threshold
 RESULTS_DIR = "results"
 TRAINED_MODELS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     "capture_lib_v2", "trained_models_target_v3")
+
+# Truth-simulator integration substeps per 10 Hz control period.
+# The control torque is held constant across the substeps.
+PLANT_SUBSTEPS = 20

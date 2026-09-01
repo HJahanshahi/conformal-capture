@@ -73,7 +73,7 @@ def q_hat_ori(lookahead):
 
 
 def kp_ori_from_uncertainty(q_bound, q_low=20.0, q_high=40.0,
-                              kp_max=5.0, kp_min=1.0):
+                              kp_max=10.0, kp_min=1.0):
     """Linearly interpolate Kp_ori based on calibrated uncertainty bound.
 
     Below q_low: full gain (kp_max=5)
@@ -96,9 +96,9 @@ T_BLEND = 1.5
 REJECT_THRESHOLD = 40.0       # reject plan if q_hat_ori > 40 deg
 GAIN_LOW_THRESHOLD = 20.0     # below this, full gain
 GAIN_HIGH_THRESHOLD = 40.0    # at/above this, min gain
-KP_ORI_MAX = 5.0
+KP_ORI_MAX = 10.0
 KP_ORI_MIN = 1.0
-KD_ORI_RATIO = 0.8            # Kd = ratio * Kp
+KD_ORI_RATIO = 0.6            # Kd = ratio * Kp
 
 
 def make_upn_propagator(upn, obs_h, obs_t, t_offset):
@@ -140,7 +140,7 @@ def run_one(traj_idx, seed=1, t_final=4.0, dt=0.1):
         temp_c = FeedbackLinearizationController(
             chaser=chaser, Kp_pos=20.0, Kd_pos=8.0,
             Kp_ori=KP_ORI_MAX, Kd_ori=KP_ORI_MAX * KD_ORI_RATIO,
-            tau_limit=10.0, t_blend_ori=T_BLEND)
+            tau_limit=20.0, t_blend_ori=T_BLEND)
         rhdot = temp_c.compute_ee_velocity(state)
         traj = solve_rendezvous_trajectory(
             rh, rhdot, target_state=None, target_inertia=IC,
@@ -159,7 +159,7 @@ def run_one(traj_idx, seed=1, t_final=4.0, dt=0.1):
     controller = FeedbackLinearizationController(
         chaser=chaser, Kp_pos=20.0, Kd_pos=8.0,
         Kp_ori=current_kp_ori, Kd_ori=current_kp_ori * KD_ORI_RATIO,
-        tau_limit=10.0, t_blend_ori=T_BLEND)
+        tau_limit=20.0, t_blend_ori=T_BLEND)
 
     n_steps = int(round(t_final / dt))
     errs_pos, errs_ori = [], []
@@ -204,7 +204,7 @@ def run_one(traj_idx, seed=1, t_final=4.0, dt=0.1):
                         chaser=chaser, Kp_pos=20.0, Kd_pos=8.0,
                         Kp_ori=current_kp_ori,
                         Kd_ori=current_kp_ori * KD_ORI_RATIO,
-                        tau_limit=10.0, t_blend_ori=T_BLEND)
+                        tau_limit=20.0, t_blend_ori=T_BLEND)
             except Exception:
                 pass
 
@@ -213,6 +213,20 @@ def run_one(traj_idx, seed=1, t_final=4.0, dt=0.1):
         ref = {"rh_des": rh_des, "rhdot_des": rhdot_des, "rhddot_des": rhddot_des}
 
         time_to_go = traj.tf - local_t
+        # --- PER-STEP GAIN MODULATION: the calibrated bound is a function of
+        # lookahead, and the lookahead shrinks while a plan runs, so the
+        # orientation gain is recomputed every control step.
+        _q_now = q_hat_ori(max(float(time_to_go), 1e-3))
+        _kp_now = kp_ori_from_uncertainty(
+            _q_now, GAIN_LOW_THRESHOLD, GAIN_HIGH_THRESHOLD,
+            KP_ORI_MAX, KP_ORI_MIN)
+        if abs(_kp_now - current_kp_ori) > 1e-9:
+            current_kp_ori = _kp_now
+            controller = FeedbackLinearizationController(
+                chaser=chaser, Kp_pos=20.0, Kd_pos=8.0,
+                Kp_ori=current_kp_ori,
+                Kd_ori=current_kp_ori * KD_ORI_RATIO,
+                tau_limit=controller.tau_limit, t_blend_ori=T_BLEND)
         future_t = t_now + time_to_go
         ho = np.asarray(obs_h[-HIST:])
         ht = np.asarray(obs_t[-HIST:])
@@ -329,13 +343,27 @@ for p_th, o_th in [(5, 5), (5, 10), (10, 10), (10, 15), (15, 15), (15, 20)]:
     print(f"  Pos<{p_th}cm AND Ori<{o_th}deg: {n}/{n_total} = {100*n/n_total:.0f}%")
 
 print()
+
+# --- baseline column read from the actual baseline run, if present ---
+_BASELINE_FILE = "path2_winning_v2_results.json"
+_b_pos = _b_ori = _b_cr = None
+try:
+    with open(_BASELINE_FILE) as _f:
+        _b = [r for r in json.load(_f) if r["success"]]
+    _b_pos = float(np.mean([r["pos_tf"] for r in _b]))
+    _b_ori = float(np.mean([r["ori_tf"] for r in _b]))
+    _b_cr = 100.0 * sum(1 for r in _b
+                        if r["pos_tf"] < 10 and r["ori_tf"] < 15) / 135.0
+except Exception:
+    pass
+
 print("=" * 78)
-print("COMPARISON to Phase 1 (no conformal)")
+print("COMPARISON to the non-adaptive baseline")
 print("=" * 78)
-print(f"               PHASE 1 (no conformal)  CONFORMAL")
-print(f"Pos at tf      5.21 cm                 {np.mean(pos_tf):.2f} cm")
-print(f"Ori at tf      11.64 deg               {np.mean(ori_tf):.2f} deg")
-print(f"Cap-ready 10/15 79%                   {100*sum(1 for p, o in zip(pos_tf, ori_tf) if p < 10 and o < 15)/n_total:.0f}%")
+print(f"               BASELINE                CONFORMAL")
+print(f"Pos at tf      {_b_pos:6.2f} cm                 {np.mean(pos_tf):.2f} cm")
+print(f"Ori at tf      {_b_ori:6.2f} deg               {np.mean(ori_tf):.2f} deg")
+print(f"Cap-ready 10/15 {_b_cr:3.0f}%                   {100*sum(1 for p, o in zip(pos_tf, ori_tf) if p < 10 and o < 15)/n_total:.0f}%")
 
 # Save
 out = []

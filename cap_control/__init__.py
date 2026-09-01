@@ -14,3 +14,5 @@ Submodules:
     utils       - SE(3) helpers, logging
 """
 __version__ = "0.1.0"
+
+from cap_control.dynamics import dynamics_extensions  # noqa: F401

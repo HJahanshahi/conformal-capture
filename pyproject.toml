@@ -19,4 +19,5 @@ dependencies = ["numpy>=1.24", "scipy>=1.10", "torch>=2.0", "matplotlib>=3.7", "
 Repository = "https://github.com/HJahanshahi/conformal-capture"
 
 [tool.setuptools.packages.find]
-include = ["cap_control*", "capture_lib_v2*"]
+where = [".", "capture_lib_v2"]
+include = ["cap_control*", "capture*"]

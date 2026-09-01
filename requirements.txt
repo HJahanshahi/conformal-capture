@@ -1,10 +1,18 @@
-# Companion library: the paper's controller needs the dynamics API added in
-# v0.3.0 (compute_effective_arm_inertia, compute_coriolis_term). The released
-# 0.2.0 does NOT contain it.
-space-robot-dq @ git+https://github.com/HJahanshahi/space-robot-dq@v0.3.0
+# Companion libraries by the same authors.
+#
+# space-robot-dq provides the free-floating kinematics, the generalized
+# Jacobian, and the base-velocity map. The reduced free-floating dynamics
+# used by this study's computed-torque controller ship with this repository
+# in cap_control/dynamics/dynamics_extensions.py.
+space-robot-dq @ git+https://github.com/HJahanshahi/space-robot-dq@v0.3.1
 
-numpy>=1.24
-scipy>=1.10
-torch>=2.0
-matplotlib>=3.7
+# upn provides the Uncertainty Propagation Network architecture used as the
+# target-motion predictor.
+upn @ git+https://github.com/HJahanshahi/upn@v1.0.0
+
+# Versions used to produce the published results.
+numpy>=1.24,<2.3
+scipy>=1.10,<1.17
+torch>=2.0,<2.9
+matplotlib>=3.7,<3.11
 tqdm

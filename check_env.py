@@ -1,4 +1,4 @@
-"""Diagnose the space_robot_dq environment mismatch.
+r"""Diagnose the space_robot_dq environment mismatch.
 
 Run twice and compare:
     python check_env.py

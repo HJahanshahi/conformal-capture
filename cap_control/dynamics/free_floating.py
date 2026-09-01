@@ -283,3 +283,24 @@ class FreeFloatingChaser:
 
 
 __all__ = ["FreeFloatingChaser", "FreeFloatingState"]
+
+# --- plant sub-stepping (added by apply_substepping.py) ---
+import numpy as _np
+from cap_control import config as _cfg
+
+_single_dynamic_step = FreeFloatingChaser.dynamic_step
+
+
+def _substepped_dynamic_step(self, state, tau, dt, include_coriolis=True):
+    """Advance the plant in cfg.PLANT_SUBSTEPS substeps, torque held fixed."""
+    n = max(1, int(getattr(_cfg, "PLANT_SUBSTEPS", 1)))
+    h = dt / n
+    for _ in range(n):
+        state = _single_dynamic_step(self, state, tau, h,
+                                      include_coriolis=include_coriolis)
+        if not _np.all(_np.isfinite(state.qdot)):
+            return state
+    return state
+
+
+FreeFloatingChaser.dynamic_step = _substepped_dynamic_step

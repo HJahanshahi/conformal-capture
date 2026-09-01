@@ -32,3 +32,5 @@ path2_tau_schedule_results.json
 #   calibration_comparison.json                      (Figure 2 coverage panel)
 #   path2_winning_v2_results.json, path2_conformal_v3_results.json
 #   paper_figures/                                   (published figures and tables)
+
+capture_lib_v2/_audit_*.npz

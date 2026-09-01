@@ -151,7 +151,7 @@ def quat_angle_deg(q1, q2):
 
 
 def kp_ori_from_uncertainty(qb, q_low=20.0, q_high=40.0,
-                              kp_max=5.0, kp_min=1.0):
+                              kp_max=10.0, kp_min=1.0):
     frac = float(np.clip((qb - q_low) / (q_high - q_low), 0.0, 1.0))
     sm = frac * frac * (3.0 - 2.0 * frac)
     return float(kp_max - (kp_max - kp_min) * sm)
@@ -228,15 +228,17 @@ def generate_statistical_figures(phase1, conf, calib):
     ax.text(0.5, 85.0, f"All within ±{max_gap:.1f}pp of target",
             fontsize=9, style="italic", color="gray")
 
-    plt.tight_layout()
     ax_a.legend(lns_a, [l.get_label() for l in lns_a], loc="upper center",
-                bbox_to_anchor=(0.5, -0.30), ncol=2, frameon=True, fontsize=9)
-    legend_below(ax_b, ncol=2, fontsize=9)
-    plt.savefig(f"{OUT_DIR}/figure02_conformal_calibration.pdf")
-    plt.savefig(f"{OUT_DIR}/figure02_conformal_calibration.png")
+                bbox_to_anchor=(0.5, -0.23), ncol=2, frameon=True, fontsize=9)
+    # two rows at ncol=2, so anchor it higher than the left panel's -0.20
+    ax_b.legend(loc="upper center", bbox_to_anchor=(0.5, -0.23),
+                ncol=2, frameon=True, fontsize=9)
+
+    plt.tight_layout()
+    plt.savefig(f"{OUT_DIR}/figure02_conformal_calibration.pdf", bbox_inches="tight")
+    plt.savefig(f"{OUT_DIR}/figure02_conformal_calibration.png", bbox_inches="tight")
     plt.close()
     print("  -> figure02_conformal_calibration.{pdf,png}")
-
     # -----------------------------------------------------------------------
 
     # FIGURE 3: CDFs
@@ -448,12 +450,13 @@ def generate_statistical_figures(phase1, conf, calib):
                                       facecolor="white", edgecolor="none",
                                       alpha=0.75))
 
-    plt.tight_layout(rect=[0, 0.04, 1, 1])
-    fig_legend_below(fig, legend_elements,
-                     [h.get_label() for h in legend_elements],
-                     ncol=2, fontsize=9)
-    plt.savefig(f"{OUT_DIR}/figure04_per_tumble_breakdown.pdf")
-    plt.savefig(f"{OUT_DIR}/figure04_per_tumble_breakdown.png")
+    plt.tight_layout(rect=[0, 0.10, 1, 1])
+    fig.legend(legend_elements, [h.get_label() for h in legend_elements],
+               loc="lower center", bbox_to_anchor=(0.5, 0.05),
+               ncol=2, frameon=True, fontsize=9)
+    plt.savefig(f"{OUT_DIR}/figure04_per_tumble_breakdown.pdf", bbox_inches="tight")
+    plt.savefig(f"{OUT_DIR}/figure04_per_tumble_breakdown.png", bbox_inches="tight")
+
     plt.close()
     print("  -> figure04_per_tumble_breakdown.{pdf,png}")
 
@@ -467,7 +470,6 @@ def generate_statistical_figures(phase1, conf, calib):
         / phase1["n_total"] * 100
     cr_conformal = ((conf["pos_tf"] < 10) & (conf["ori_tf"] < 15)).sum() \
         / conf["n_total"] * 100
-
 
     for ax, data, title in [
             (axes[0], phase1, f"(a) Baseline\n{cr_baseline:.0f}% capture-ready"),
@@ -485,7 +487,6 @@ def generate_statistical_figures(phase1, conf, calib):
         ax.set_title(title, fontsize=9)
         ax.set_xlim(0, 30)
         ax.set_ylim(0, 80)
-        legend_below(ax, ncol=1, fontsize=9)
 
     sm = plt.cm.ScalarMappable(cmap="viridis",
                                   norm=plt.Normalize(vmin=0, vmax=30))
@@ -494,6 +495,16 @@ def generate_statistical_figures(phase1, conf, calib):
                           fraction=0.025, pad=0.02)
     cbar.set_label("Tumble rate (deg/s)", size=9)
     cbar.ax.tick_params(labelsize=8)
+
+    # single legend under both panels; y is in figure coords, negative = below
+    handles, labels = axes[0].get_legend_handles_labels()
+    leg = fig.legend(handles, labels, loc="lower center",
+                     bbox_to_anchor=(0.47, -0.12),
+                     ncol=1, frameon=True, fontsize=9)
+    # the zone is drawn at alpha=0.07, which is invisible in a small swatch
+    for h in leg.legend_handles:
+        h.set_alpha(0.3)
+
     plt.savefig(f"{OUT_DIR}/figure05_capture_scatter.pdf", bbox_inches="tight")
     plt.savefig(f"{OUT_DIR}/figure05_capture_scatter.png", bbox_inches="tight")
     plt.close()
@@ -504,7 +515,7 @@ def generate_statistical_figures(phase1, conf, calib):
     # FIGURE 6: Rejection-stratified capture analysis
     # -----------------------------------------------------------------------
     print("\nGenerating Figure 6: Rejection-stratified capture analysis...")
- 
+
     # Stratify by NUMBER OF REJECTIONS (meaningful, varies across runs)
     # Hypothesis: 0 rejections = "easy" runs (UPN confident), high success
     #             1-3 rejections = "moderate" caution triggered
@@ -521,9 +532,9 @@ def generate_statistical_figures(phase1, conf, calib):
         if nr == 0: strata["0 rejections"].append(captured)
         elif nr <= 3: strata["1-3 rejections"].append(captured)
         else: strata["4+ rejections"].append(captured)
- 
+
     fig, axes = plt.subplots(1, 2, figsize=(7.16, 3.3))
- 
+
     # Panel (a): capture rate per rejection stratum
     ax = axes[0]
     group_names = list(strata.keys())
@@ -549,7 +560,7 @@ def generate_statistical_figures(phase1, conf, calib):
         ax.text(i, rate + 2, f"{rate:.0f}%", ha="center",
                   fontsize=10, fontweight="bold")
         ax.text(i, 5, f"n={n}", ha="center", fontsize=9, color="white")
- 
+
     # Panel (b): rejection frequency histogram (unchanged)
     ax = axes[1]
     counts, bins, _ = ax.hist(conf["n_rejected"],
@@ -579,14 +590,18 @@ def generate_statistical_figures(phase1, conf, calib):
                                           color="red", alpha=0.7, lw=1.5))
     ax_hist = ax
 
+    # legends before tight_layout so the reserved space accounts for them
+    ax_bar.legend(loc="upper center", bbox_to_anchor=(0.5, -0.13),
+                  ncol=1, frameon=True, fontsize=9)
+    ax_hist.legend(loc="upper center", bbox_to_anchor=(0.5, -0.20),
+                   ncol=1, frameon=True, fontsize=9)
+
     plt.tight_layout()
-    legend_below(ax_bar, ncol=1)
-    legend_below(ax_hist, ncol=1)
-    plt.savefig(f"{OUT_DIR}/figure06_rejection_stratified.pdf")
-    plt.savefig(f"{OUT_DIR}/figure06_rejection_stratified.png")
+    plt.savefig(f"{OUT_DIR}/figure06_rejection_stratified.pdf", bbox_inches="tight")
+    plt.savefig(f"{OUT_DIR}/figure06_rejection_stratified.png", bbox_inches="tight")
     plt.close()
     print("  -> figure06_rejection_stratified.{pdf,png}")
- 
+
     for f in ["fig5_threshold_sweep", "fig9_orientation_time", "fig6_rejection_stats"]:
         for ext in ["pdf", "png"]:
             p = f"{OUT_DIR}/{f}.{ext}"
@@ -792,7 +807,7 @@ def generate_trajectory_figures(calib):
         return prop
 
     def run_with_logging(traj_idx, seed=1, t_final=4.0, dt=0.1,
-                           kp_ori_max=5.0, t_blend=1.5,
+                           kp_ori_max=10.0, t_blend=1.5,
                            reject_threshold=40.0):
         chaser = FreeFloatingChaser()
         state = chaser.home()
@@ -811,8 +826,8 @@ def generate_trajectory_figures(calib):
         rh, _ = chaser.fk_world(state)
         temp_c = FeedbackLinearizationController(
             chaser=chaser, Kp_pos=20.0, Kd_pos=8.0,
-            Kp_ori=kp_ori_max, Kd_ori=kp_ori_max * 0.8,
-            tau_limit=10.0, t_blend_ori=t_blend)
+            Kp_ori=kp_ori_max, Kd_ori=kp_ori_max * 0.6,
+            tau_limit=20.0, t_blend_ori=t_blend)
         rhdot = temp_c.compute_ee_velocity(state)
         prop = make_upn_propagator(upn, obs_h, obs_t, t_offset=0.0)
         traj = solve_rendezvous_trajectory(
@@ -825,8 +840,8 @@ def generate_trajectory_figures(calib):
         consec_rej = 0
         controller = FeedbackLinearizationController(
             chaser=chaser, Kp_pos=20.0, Kd_pos=8.0,
-            Kp_ori=current_kp_ori, Kd_ori=current_kp_ori * 0.8,
-            tau_limit=10.0, t_blend_ori=t_blend)
+            Kp_ori=current_kp_ori, Kd_ori=current_kp_ori * 0.6,
+            tau_limit=20.0, t_blend_ori=t_blend)
 
         n_steps = int(round(t_final / dt))
         log = {"t": [], "ee_pos": [], "ee_quat": [], "target_pos": [],
@@ -872,8 +887,8 @@ def generate_trajectory_figures(calib):
                         controller = FeedbackLinearizationController(
                             chaser=chaser, Kp_pos=20.0, Kd_pos=8.0,
                             Kp_ori=current_kp_ori,
-                            Kd_ori=current_kp_ori * 0.8,
-                            tau_limit=10.0, t_blend_ori=t_blend)
+                            Kd_ori=current_kp_ori * 0.6,
+                            tau_limit=20.0, t_blend_ori=t_blend)
                 except Exception:
                     pass
 
@@ -883,6 +898,15 @@ def generate_trajectory_figures(calib):
                     "rhddot_des": rhddot_des}
 
             time_to_go = traj.tf - local_t
+            # --- PER-STEP GAIN MODULATION (matches the benchmark) ---
+            _q_now = q_hat_ori(max(float(time_to_go), 1e-3))
+            _kp_now = kp_ori_from_uncertainty(_q_now)
+            if abs(_kp_now - current_kp_ori) > 1e-9:
+                current_kp_ori = _kp_now
+                controller = FeedbackLinearizationController(
+                    chaser=chaser, Kp_pos=20.0, Kd_pos=8.0,
+                    Kp_ori=current_kp_ori, Kd_ori=current_kp_ori * 0.6,
+                    tau_limit=20.0, t_blend_ori=t_blend)
             future_t = t_now + time_to_go
             ho = np.asarray(obs_h[-HIST:])
             ht = np.asarray(obs_t[-HIST:])
@@ -932,8 +956,8 @@ def generate_trajectory_figures(calib):
     log_success = run_with_logging(traj_idx=13, seed=2)
     print(f"  Final: {log_success['pos_err'][-1]:.2f} cm / {log_success['ori_err'][-1]:.2f} deg")
 
-    print("\nRecording FAILURE run (traj 33, seed 1)...")
-    log_failure = run_with_logging(traj_idx=33, seed=1)
+    print("\nRecording FAILURE run (traj 42, seed 1)...")
+    log_failure = run_with_logging(traj_idx=42, seed=1)
     print(f"  Final: {log_failure['pos_err'][-1]:.2f} cm / {log_failure['ori_err'][-1]:.2f} deg")
 
     # FIGURE 7: 3D trajectory
@@ -942,7 +966,7 @@ def generate_trajectory_figures(calib):
 
     for idx, (log, title) in enumerate(
         [(log_success, "(a) Successful capture (traj 13)"),
-          (log_failure, "(b) Failure case (traj 33)")]):
+          (log_failure, "(b) Failure case (traj 42)")]):
         ax = fig.add_subplot(1, 2, idx + 1, projection="3d")
         ee = log["ee_pos"]; grasp = log["grasp_pos"]
 
@@ -1058,11 +1082,15 @@ def generate_trajectory_figures(calib):
                          fontsize=9, fontweight="bold", pad=8)
 
     axes[-1].set_xlabel("Time (s)", fontsize=10)
-    plt.tight_layout(h_pad=1.2)
+
+    # reserve room at the bottom, then place the legend in it
+    plt.tight_layout(h_pad=1.2, rect=[0, 0.07, 1, 1])
     handles, labels = axes[0].get_legend_handles_labels()
-    fig_legend_below(fig, handles, labels, ncol=1, fontsize=8)
-    plt.savefig(f"{OUT_DIR}/figure08_position_tracking_error.pdf")
-    plt.savefig(f"{OUT_DIR}/figure08_position_tracking_error.png")
+    fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 0.000),
+               ncol=2, frameon=True, fontsize=8)
+
+    plt.savefig(f"{OUT_DIR}/figure08_position_tracking_error.pdf", bbox_inches="tight")
+    plt.savefig(f"{OUT_DIR}/figure08_position_tracking_error.png", bbox_inches="tight")
     plt.close()
     print("  -> figure08_position_tracking_error.{pdf,png}")
 
@@ -1078,7 +1106,7 @@ def generate_trajectory_figures(calib):
     fig, axes = plt.subplots(2, 2, figsize=(7.16, 4.8), sharex="col")
     for col_idx, (log, title) in enumerate(
         [(log_success, "Successful capture (traj 13)"),
-          (log_failure, "Failure case (traj 33)")]):
+          (log_failure, "Failure case (traj 42)")]):
         t = log["t"]
         rejs = log["rejected_events"]
         n_rejs = len(rejs)
@@ -1179,18 +1207,18 @@ def generate_trajectory_figures(calib):
     ax = axes[1]
     ax.plot(t, log["kp_ori_active"], color="purple", linewidth=1.8, zorder=3,
             label="Active orientation gain $K_{p,\\mathrm{ori}}$")
-    ax.axhline(5.0, color="black", ls=":", alpha=0.5, linewidth=1.2,
-               label="$K_{p,\\mathrm{max}}=5$")
+    ax.axhline(10.0, color="black", ls=":", alpha=0.5, linewidth=1.2,
+               label="$K_{p,\\mathrm{max}}=10$")
     ax.axhline(1.0, color="black", ls=":", alpha=0.5, linewidth=1.2,
                label="$K_{p,\\mathrm{min}}=1$")
     ax.set_ylabel("$K_{p,\\mathrm{ori}}$", fontsize=10)
-    ax.set_ylim(0, 7)
+    ax.set_ylim(0, 12)
     ax.set_xlim(t0, t1)
     ax.set_xlabel("Time (s)", fontsize=10)
     ax.tick_params(axis="both", labelsize=9)
 
     kp = np.asarray(log["kp_ori_active"])
-    gain_transition_idx = int(np.argmax(kp > 4.9))
+    gain_transition_idx = int(np.argmax(kp > 9.9))
     if 0 < gain_transition_idx < len(t):
         t_trans = t[gain_transition_idx]
         ax.annotate("$\\hat{q}_{\\mathrm{ori}}$ drops\nbelow 20°",

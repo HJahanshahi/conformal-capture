@@ -51,7 +51,7 @@ rep("calibration file",
 # ---- 2. smooth (logistic) gain modulation ----------------------------------
 rep("sigmoid gain map",
     '''def kp_ori_from_uncertainty(q_bound, q_low=20.0, q_high=40.0,
-                              kp_max=5.0, kp_min=1.0):
+                              kp_max=10.0, kp_min=1.0):
     """Linearly interpolate Kp_ori based on calibrated uncertainty bound.
 
     Below q_low: full gain (kp_max=5)
@@ -65,7 +65,7 @@ rep("sigmoid gain map",
     frac = (q_bound - q_low) / (q_high - q_low)
     return kp_max * (1 - frac) + kp_min * frac''',
     '''def kp_ori_from_uncertainty(q_bound, q_low=20.0, q_high=40.0,
-                              kp_max=5.0, kp_min=1.0):
+                              kp_max=10.0, kp_min=1.0):
     """Smooth (C1 smoothstep) gain schedule on the calibrated bound.
 
     Same endpoints and midpoint as the piecewise-linear ramp, but with
@@ -78,8 +78,8 @@ rep("sigmoid gain map",
 
 # ---- 3+6. run_one counters ---------------------------------------------------
 rep("contingency helper",
-    """KD_ORI_RATIO = 0.8            # Kd = ratio * Kp""",
-    """KD_ORI_RATIO = 0.8            # Kd = ratio * Kp
+    """KD_ORI_RATIO = 0.6            # Kd = ratio * Kp""",
+    """KD_ORI_RATIO = 0.6            # Kd = ratio * Kp
 
 
 def _largest_admissible_lookahead():

@@ -27,8 +27,8 @@ def run(cmd):
         sys.exit(f"FAILED: {' '.join(cmd)}")
 
 
-REQUIRED_DYN_METHODS = ("compute_effective_arm_inertia", "compute_coriolis_term",
-                         "compute_generalized_jacobian", "compute_base_velocity")
+REQUIRED_DYN_METHODS = ("compute_generalized_jacobian", "compute_base_velocity",
+                         "compute_inertia_matrices", "compute_link_jacobians")
 
 
 def preflight():
@@ -41,15 +41,15 @@ def preflight():
     except Exception as e:
         sys.exit("space_robot_dq is not importable (%s).\n"
                  "Install it with:  pip install "
-                 "\"space-robot-dq @ git+https://github.com/HJahanshahi/space-robot-dq@v0.3.0\"" % e)
+                 "\"space-robot-dq @ git+https://github.com/HJahanshahi/space-robot-dq@v0.3.1\"" % e)
     missing = [m for m in REQUIRED_DYN_METHODS
                if not hasattr(SpaceRobotDynamics, m)]
     if missing:
         sys.exit(
             "space_robot_dq at %s is missing: %s\n"
-            "This build predates the dynamics API used by the paper's controller.\n"
-            "Install v0.3.0 or newer:  pip install --force-reinstall "
-            "\"space-robot-dq @ git+https://github.com/HJahanshahi/space-robot-dq@v0.3.0\""
+            "This build predates the API this study relies on.\n"
+            "Install v0.3.1 or newer:  pip install --force-reinstall "
+            "\"space-robot-dq @ git+https://github.com/HJahanshahi/space-robot-dq@v0.3.1\""
             % (os.path.dirname(space_robot_dq.__file__), ", ".join(missing)))
     print("preflight OK: space_robot_dq %s at %s"
           % (getattr(space_robot_dq, "__version__", "?"),

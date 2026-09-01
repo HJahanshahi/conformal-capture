@@ -39,8 +39,8 @@ RHO_BODY = np.array([0.1, 0.0, 0.0])
 IC = np.diag([10.0, 10.0, 10.0])
 
 # WINNING CONFIG
-KP_ORI = 5.0
-KD_ORI = 4.0
+KP_ORI = 10.0
+KD_ORI = 6.0
 T_BLEND = 1.5
 
 
@@ -67,7 +67,7 @@ def run_one(traj_idx, seed=1, t_final=4.0, dt=0.1):
     controller = FeedbackLinearizationController(
         chaser=chaser, Kp_pos=20.0, Kd_pos=8.0,
         Kp_ori=KP_ORI, Kd_ori=KD_ORI,
-        tau_limit=10.0, t_blend_ori=T_BLEND)
+        tau_limit=20.0, t_blend_ori=T_BLEND)
 
     HIST = cfg.UPN_HISTORY_LEN; SDT = cfg.SENSOR_DT
     obs_h, obs_t = [], []

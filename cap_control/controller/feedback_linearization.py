@@ -48,7 +48,7 @@ class FeedbackLinearizationController(MPCBase):
 
     def __init__(self, chaser, Kp_pos=20.0, Kd_pos=8.0,
                  Kp_ori=20.0, Kd_ori=8.0,
-                 tau_limit=10.0, damping_lambda=0.01,
+                 tau_limit=20.0, damping_lambda=0.01,
                  t_blend_ori=0.5):
         super().__init__()
         self.chaser = chaser
